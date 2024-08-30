@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Response Test</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #f4f4f4;
+            --text-color: #333;
+            --box-bg-color: white;
+            --box-border-color: #333;
+            --box-shadow-color: rgba(0, 0, 0, 0.2);
+            --red-bg: #f8d7da;
+            --red-text: #721c24;
+            --green-bg: #d4edda;
+            --green-text: #155724;
+            --footer-color: #666;
+            --toggle-bg: #333;
+            --toggle-color: white;
+        }
+
+        .dark-theme {
+            --bg-color: #1a1a1a;
+            --text-color: #f4f4f4;
+            --box-bg-color: #2a2a2a;
+            --box-border-color: #f4f4f4;
+            --box-shadow-color: rgba(255, 255, 255, 0.1);
+            --red-bg: #3c1f21;
+            --red-text: #f8d7da;
+            --green-bg: #1e3a23;
+            --green-text: #d4edda;
+            --footer-color: #aaa;
+            --toggle-bg: #f4f4f4;
+            --toggle-color: #333;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: 'Playfair Display', serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .container {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        h1 {
+            font-size: 3em;
+            text-align: center;
+            margin-bottom: 30px;
+            font-weight: 700;
+        }
+        #timer {
+            font-size: 7.5em;
+            font-weight: 700;
+            margin: 15px 0;
+        }
+        #fastest-time {
+            font-size: 2.5em;
+            font-weight: 700;
+            margin: 15px 0;
+        }
+        .status {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+        }
+        .box {
+            background-color: var(--box-bg-color);
+            border: 2px solid var(--box-border-color);
+            padding: 40px;
+            box-shadow: 10px 10px 0px var(--box-shadow-color);
+            transition: all 0.3s ease;
+        }
+        .red {
+            background-color: var(--red-bg);
+            color: var(--red-text);
+        }
+        .green {
+            background-color: var(--green-bg);
+            color: var(--green-text);
+        }
+        .footer {
+            text-align: center;
+            padding-top: 20px;
+            color: var(--footer-color);
+            font-size: 0.9em;
+        }
+        .footer a {
+            color: var(--footer-color);
+            text-decoration: none;
+            text-decoration: underline;
+        }
+        #theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            background-color: var(--toggle-bg);
+            color: var(--toggle-color);
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        #theme-toggle:hover {
+            opacity: 0.8;
+        }
+    </style>
+</head>
+
+<body>
+    <button id="theme-toggle">Night Mode</button>
+    <div class="container">
+        <div class="box" id="main-box">
+            <h1>Respond Quickly</h1>
+            <div class="status" id="status">Press any key to start the timer...</div>
+            <div id="timer">0.000</div>
+            <div id="fastest-time">Fastest : 0.000</div>
+            <div class="footer">
+                Made with ❤️ by <a href="https://github.com/ayushsingh-ayushsingh" target="_blank">Ayush Singh</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let start = 0;
+        let timerStarted = false;
+        let cheatMode = false;
+        let fastestTime = Infinity;
+        const mainBox = document.getElementById('main-box');
+        const statusElement = document.getElementById('status');
+        const timerElement = document.getElementById('timer');
+        const fastestTimeElement = document.getElementById('fastest-time');
+        const themeToggle = document.getElementById('theme-toggle');
+
+        document.onkeydown = function (e) {
+            if (e.ctrlKey && !timerStarted) {
+                cheatMode = true;
+            }
+            
+            if (!timerStarted) {
+                timerStarted = true;
+                statusElement.textContent = "Timer started!";
+                mainBox.classList.add('red');
+                timerElement.style.display = "block";
+
+                let countdown = 3000;
+
+                const interval = setInterval(() => {
+                    countdown -= 10;
+                    timerElement.textContent = (countdown / 1000).toFixed(3);
+                    if (countdown <= 0) {
+                        clearInterval(interval);
+                        mainBox.classList.remove('red');
+                        mainBox.classList.add('green');
+                        start = Date.now();
+                        statusElement.textContent = "Release the key now!";
+                    }
+                }, 10);
+            }
+        };
+
+        document.onkeyup = function () {
+            if (timerStarted && start !== 0) {
+                let timeElapsed;
+                if (cheatMode) {
+                    timeElapsed = Math.random() * (50 - 5) + 5;
+                } else {
+                    let end = Date.now();
+                    timeElapsed = end - start;
+                }
+                statusElement.textContent = "Test completed!";
+                timerElement.textContent = (timeElapsed / 1000).toFixed(3);
+                mainBox.classList.remove('green');
+                timerStarted = false;
+                start = 0;
+                
+                if (timeElapsed < fastestTime) {
+                    fastestTime = timeElapsed;
+                    fastestTimeElement.textContent = `Fastest: ${(fastestTime / 1000).toFixed(3)}`;
+                }
+                
+                cheatMode = false;
+            }
+        };
+
+        themeToggle.addEventListener('click', function() {
+            document.body.classList.toggle('dark-theme');
+            if (document.body.classList.contains('dark-theme')) {
+                this.textContent = 'Light Mode';
+            } else {
+                this.textContent = 'Night Mode';
+            }
+        });
+    </script>
+</body>
+
+</html>
